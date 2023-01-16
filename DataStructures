@@ -1,0 +1,162 @@
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+#define mod 1000000007
+#define ll long long 
+#define ppi pair<ll,ll>
+#define INF (ll)1e18
+#define PI 3.1415926535
+#define MAX 1000000001
+using namespace std;
+using namespace __gnu_pbds;
+
+//ordered set
+typedef tree<int, null_type, less_equal<int>, rb_tree_tag,
+tree_order_statistics_node_update>ordered_multiset;
+
+//Union Find Code
+
+class UnionFind {
+public:
+    vector<int> par;
+    void init(int sz) {
+        par.resize(sz, -1);
+    }
+    int root(int pos) {
+        if (par[pos] == -1) return pos;
+        par[pos] = root(par[pos]);
+        return par[pos];
+    }
+    void unite(int u, int v) {
+        u = root(u); v = root(v);
+        if (u == v) return;
+        par[u] = v;
+    }
+    bool same(int u, int v) {
+        if (root(u) == root(v)) return true;
+        return false;
+    }
+};
+
+//Fenwick Tree Code
+
+ll resetRightMostBit(ll n){
+    for(ll i=0;i<64;i++){
+        if((1<<i)&n){
+            return (1<<i);
+        }
+    }
+}
+ll getSum(vector<ll>&bit,ll index){
+    index++;
+    ll sum=0;
+    while(index>0){
+        sum+=bit[index];
+        ll x=resetRightMostBit(index);
+        index-=x;
+    }
+    return sum;
+}
+void update(vector<ll>&bit,ll index,ll n,ll num){
+    index++;
+    while(index<=n){
+        bit[index]+=num;
+        index+=(index & (-index));
+    }
+}
+
+//Range Minimum Query Code
+
+void createSegTree(int a[],int segTree[],int low,int high,int pos){
+    if(low==high){
+        segTree[pos]=a[low];
+        return;
+    }
+    int mid=(low+high)/2;
+    createSegTree(a,segTree,low,mid,2*pos+1);
+    createSegTree(a,segTree,mid+1,high,2*pos+2);
+    segTree[pos]=min(segTree[2*pos+1],segTree[2*pos+2]);
+}
+int rmq(int segTree[],int qLow,int qHigh,int low,int high,int pos){
+    if(qLow<=low && qHigh>=high){
+        return segTree[pos];
+    }
+    if(qLow>high || qHigh<low){
+        return MAX;
+    }
+    int mid=(low+high)/2;
+    return min(rmq(segTree,qLow,qHigh,low,mid,2*pos+1),rmq(segTree,qLow,qHigh,mid+1,high,2*pos+2));
+}
+void segTreeUpdate(int segTree[],int low,int high,int pos,int i,int x){
+    if(i<low || i>high)return;
+    if(low==high){
+        segTree[pos]=x;return;
+    }
+    int mid=(low+high)/2;
+    segTreeUpdate(segTree,low,mid,2*pos+1,i,x);
+    segTreeUpdate(segTree,mid+1,high,2*pos+2,i,x);
+    segTree[pos]=min(segTree[2*pos+1],segTree[2*pos+2]);
+}
+
+// SegTreeCode with lazy propagation
+
+void createSegTree(ll a[],ll segTree[],int low,int high,int pos){
+    if(low==high){
+        segTree[pos]=a[low];
+        return;
+    }
+    int mid=(low+high)/2;
+    createSegTree(a,segTree,low,mid,2*pos+1);
+    createSegTree(a,segTree,mid+1,high,2*pos+2);
+    segTree[pos]=segTree[2*pos+1]+segTree[2*pos+2];
+}
+// update by lazy propagation
+
+void update(ll segTree[],ll lazy[],int low,int high,int uLow,int uHigh,int pos,ll delta){
+    if(low>high)return;
+    if(lazy[pos]){
+        if(low!=high){
+            lazy[2*pos+1]+=lazy[pos];
+            lazy[2*pos+2]+=lazy[pos];
+        }
+        segTree[pos]+=lazy[pos];
+        lazy[pos]=0;
+    }
+    if(uLow>high || uHigh<low)return;
+    if(uLow<=low && uHigh>=high){
+        segTree[pos]+=delta;
+        if(low!=high){
+            lazy[2*pos+1]+=delta;
+            lazy[2*pos+2]+=delta;
+        }
+        return;
+    }
+    int mid=(low+high)/2;
+    update(segTree,lazy,low,mid,uLow,uHigh,2*pos+1,delta);
+    update(segTree,lazy,mid+1,high,uLow,uHigh,2*pos+2,delta);
+    segTree[pos]=segTree[2*pos+1]+segTree[2*pos+2];
+}
+// get The Sum of The given range
+
+ll getSum(ll segTree[],ll lazy[],int low,int high,int qLow,int qHigh,int pos){
+    if(low>high)return 0;
+    if(qLow>high || qHigh<low)return 0LL;
+    if(lazy[pos]){
+        if(low!=high){
+            lazy[2*pos+1]+=lazy[pos];
+            lazy[2*pos+2]+=lazy[pos];
+        }
+        segTree[pos]+=lazy[pos];
+        lazy[pos]=0;
+    }
+    if(qLow<=low && qHigh>=high)return segTree[pos];
+    int mid=(low+high)/2;
+    return segTree[pos]=getSum(segTree,lazy,low,mid,qLow,qHigh,2*pos+1)+getSum(segTree,lazy,mid+1,high,qLow,qHigh,2*pos+2);
+}
+int main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); 
+   
+}
+
+
+
