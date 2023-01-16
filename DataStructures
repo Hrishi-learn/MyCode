@@ -9,7 +9,8 @@
 using namespace std;
 using namespace __gnu_pbds;
 
-//ordered set
+//lowerbound and upperbound are swaped due to less_equal<int>
+//ordered set 
 typedef tree<int, null_type, less_equal<int>, rb_tree_tag,
 tree_order_statistics_node_update>ordered_multiset;
 
