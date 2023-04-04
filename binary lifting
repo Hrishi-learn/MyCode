@@ -14,6 +14,22 @@ void binary_lifting(int u,int p){
         binary_lifting(x,u);
     }
 }
+int lca(int a,int b){
+    if(depth[a]<depth[b])swap(a,b);
+    int d=depth[a]-depth[b];
+    for(int i=19;i>=0;i--){
+        if(d&(1<<i)){
+            a=dp[a][i];
+        }
+    }
+    if(a==b)return a;
+    for(int i=19;i>=0;i--){
+        if(dp[a][i]!=dp[b][i]){
+            a=dp[a][i];b=dp[b][i];
+        }
+    }
+    return dp[a][0];
+}
 int ancestor(int u,int k){
     if(k==0 || u==-1)return u;
 
