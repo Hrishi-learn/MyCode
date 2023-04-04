@@ -1,0 +1,25 @@
+int dp[200010][20];
+vector<int>adj[200010];
+void binary_lifting(int u,int p){
+    dp[u][0]=p;
+    for(int i=1;i<20;i++){
+        if(dp[u][i-1]!=-1){
+            dp[u][i]=dp[dp[u][i-1]][i-1];
+        }else{
+            dp[u][i]=-1;
+        }
+    }
+    for(auto x:adj[u]){
+        if(x==p)continue;
+        binary_lifting(x,u);
+    }
+}
+int ancestor(int u,int k){
+    if(k==0 || u==-1)return u;
+
+    for(int i=19;i>=0;i--){
+        if(k&(1<<i)){
+            return ancestor(dp[u][i],k^(1<<i));
+        }
+    }
+}
